@@ -22,6 +22,8 @@ import sphinx_rtd_theme
 
 import context
 
+from flask_dynamo_session.__version__ import __version__
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 # -- General configuration ------------------------------------------------
@@ -57,7 +59,7 @@ author = 'Austin Page'
 # built documents.
 #
 # The short X.Y version.
-version = context.flask_dynamo_session.__version__
+version = __version__
 # The full version, including alpha/beta/rc tags.
 release = ''
 

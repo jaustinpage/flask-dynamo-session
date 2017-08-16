@@ -2,22 +2,22 @@
 
 from setuptools import setup, find_packages
 
-import flask_dynamo_session
+from flask_dynamo_session.__version__ import __version__
 
-with open('README.md') as f:
+with open('README.rst') as f:
     readme = f.read()
 
 with open('LICENSE') as f:
     license_file = f.read()
 
 setup(
-    name='flask_dynamo_session',
-    version=flask_dynamo_session.__version__,
+    name='flask-dynamo-session',
+    version=__version__,
     description='Flask extension for storing session in dynamodb. Uses flask_dynamo.',
     long_description=readme,
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha', 'Environment :: Console', 'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License', 'Topic :: Software Development :: Libraries :: Python Modules',
+        'License :: OSI Approved :: Apache Software License',
+        'Development Status :: 2 - Pre-Alpha',
         'Programming Language :: Python :: 3.6'
     ],
     keywords='flask dynamo dynamodb, flask-dynamo',
