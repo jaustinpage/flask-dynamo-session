@@ -19,17 +19,18 @@ jobs:
 
       - restore-cache:
           keys:
-            - v1-python-{{ checksum "Pipfile.lock" }}
-            - v1-python-
+            - v1-py3-{{ checksum "Pipfile.lock" }}
+            - v1-py3-
 
       - run:
           name: "Python dependencies, tests, and build"
           environment:
             PIPENV_NOSPIN: True
             CI_TEST_REPORTS: /tmp/ci_reports/
+            PYTHON_VERSION: 3
           command: |
             set -e
-            scripts/pipenv
+            scripts/pipenv-update
             scripts/pytest
             scripts/build
 
@@ -42,7 +43,7 @@ jobs:
             fi
 
       - save-cache:
-          key: v1-python-{{ checksum "Pipfile.lock" }}-{{ epoch }}
+          key: v1-py3-{{ checksum "Pipfile.lock" }}-{{ epoch }}
           paths:
             - ~/.cache/pip
 
@@ -52,6 +53,65 @@ jobs:
       - store_artifacts:
           path: ./dist/
           destination: py3
+
+      - persist_to_workspace:
+          root: ./dist/
+          paths:
+            - ./
+
+  py2:
+    docker:
+      - image: python:2-alpine
+
+    working_directory: ~/flask-dynamo-session
+    parallelism: 1
+    steps:
+      - checkout
+
+      - run:
+          name: "Install dependencies from alpine pkgs"
+          command: |
+            set -e
+            set -x
+            apk add --update ca-certificates git gzip python3 tar
+            update-ca-certificates
+
+      - restore-cache:
+          keys:
+            - v1-py2-{{ checksum "Pipfile.lock" }}
+            - v1-py2-
+
+      - run:
+          name: "Python dependencies, tests, and build"
+          environment:
+            PIPENV_NOSPIN: True
+            CI_TEST_REPORTS: /tmp/ci_reports/
+            PYTHON_VERSION: 2
+          command: |
+            set -e
+            scripts/pipenv-update --two
+            scripts/pytest
+            scripts/build
+
+      - run:
+          name: "Python release"
+          command: |
+            set -e
+            if [ "$CIRCLE_BRANCH" = "master" ]; then
+              scripts/release
+            fi
+
+      - save-cache:
+          key: v1-py2-{{ checksum "Pipfile.lock" }}-{{ epoch }}
+          paths:
+            - ~/.cache/pip
+
+      - store_test_results:
+          path: /tmp/ci_reports
+
+      - store_artifacts:
+          path: ./dist/
+          destination: py2
 
       - persist_to_workspace:
           root: ./dist/
@@ -90,9 +150,11 @@ workflows:
   test:
     jobs:
       - py3
+      - py2
       - gh_release:
           requires:
             - py3
+            - py2
           filters:
             branches:
               only: master

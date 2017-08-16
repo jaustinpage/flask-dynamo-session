@@ -117,13 +117,15 @@ update_requirements () {
 }
 
 check_requirements () {
-    requirements_diff=$(pipenv run pip freeze | diff - requirements.txt) || true
-    if [ "$requirements_diff" ]; then
-        printf "\n$requirements_diff\n\n"
-        printf "requirements.txt out of sync with pipenv. Run $SCRIPT_DIR/pytest to fix.\n"
-        exit 1
-    else
-        printf ""
+    if [ "$PYTHON_VERSION" = "3" ]; then
+        requirements_diff=$(pipenv run pip freeze | diff - requirements.txt) || true
+        if [ "$requirements_diff" ]; then
+            printf "\n$requirements_diff\n\n"
+            printf "requirements.txt out of sync with pipenv. Run $SCRIPT_DIR/pytest to fix.\n"
+            exit 1
+        else
+            printf ""
+        fi
     fi
 }
 

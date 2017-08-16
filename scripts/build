@@ -10,9 +10,11 @@ cd ..
 
 command -v pipenv >/dev/null 2>&1 || { printf >&2 "I require pipenv but I am having trouble finding it. Try running $SCRIPT_DIR/pipenv.\n"; exit 1; }
 
-printf "==> python setup.py sdist...\n"
-pipenv run python setup.py sdist
-printf "\n"
+if [ "$PYTHON_VERSION" = "3" ]; then
+    printf "==> python setup.py sdist...\n"
+    pipenv run python setup.py sdist
+    printf "\n"
+fi
 
 printf "==> python setup.py bdist_wheel...\n"
 pipenv run python setup.py bdist_wheel

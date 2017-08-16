@@ -24,5 +24,5 @@ setup(
     author='Austin Page',
     author_email='jaustinpage@gmail.com',
     url='https://github.com/jaustinpage/flask-dynamo-session',
-    license=license_file,
+    license='Apache Software',
     packages=find_packages(exclude=('docs', 'scripts', 'tests')))

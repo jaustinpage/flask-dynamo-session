@@ -7,26 +7,10 @@ set -x
 
 START_DIR="$PWD"
 SCRIPT_DIR="$( cd "$( dirname -- "$0" )" && pwd )"
-PIPENV_ARGS="${@:1}"
-PYTHON_VERSION=""
 
-while [[ $# -gt 1 ]]; do
-    key="$1"
-
-    case $key in
-        --three)
-        PYTHON_VERSION="3"
-        ;;
-        --two)
-        PYTHON_VERSION="2"
-        ;;
-        *)
-
-        ;;
-    esac
-
-    shift
-done
+if [ -z "$PYTHON_VERSION" ]; then
+    PYTHON_VERSION="3"
+fi
 
 install_pipenv () {
     if [ "$CI" = "true" ]; then
@@ -81,13 +65,5 @@ cd ..
 
 install_pipenv
 pipenv_init
-
-if [ ! -z "$PIPENV_ARGS" ]; then
-    if [ ! -z "PYTHON_VERSION" ]; then
-        pipenv --three $PIPENV_ARGS
-    else
-        pipenv $PIPENV_ARGS
-    fi
-fi
 
 cd $START_DIR
