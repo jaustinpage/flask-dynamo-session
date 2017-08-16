@@ -59,6 +59,7 @@ pipenv_init () {
         if [ "$PYTHON_VERSION" = "2" ]; then
             pipenv install --dev --two --ignore-pipfile
         else
+            pipenv check --three
             pipenv install --dev --three --ignore-pipfile
         fi
 

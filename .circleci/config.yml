@@ -33,6 +33,14 @@ jobs:
             scripts/pytest
             scripts/build
 
+      - run:
+          name: "Python release"
+          command: |
+            set -e
+            if [ "$CIRCLE_BRANCH" = "master" ]; then
+              scripts/release
+            fi
+
       - save-cache:
           key: v1-python-{{ checksum "Pipfile.lock" }}-{{ epoch }}
           paths:
@@ -73,7 +81,7 @@ jobs:
       - run:
           name: "Upload GitHub Release"
           command: |
-            version=$(awk -F '"' '/^__version__/ {print $2}' flask_dynamo_session/__init__.py)
+            version=$(awk -F '"' '/^__version__/ {print $2}' flask_dynamo_session/__version__.py)
             ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME $version /tmp/workspace || true
             ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -recreate -prerelease master /tmp/workspace
 

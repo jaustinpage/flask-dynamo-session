@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+START_DIR="$PWD"
+SCRIPT_DIR="$( cd "$( dirname -- "$0" )" && pwd )"
+
+cd $SCRIPT_DIR
+cd ..
+
+command -v pipenv >/dev/null 2>&1 || { printf >&2 "I require pipenv but I am having trouble finding it.\n"; exit 1; }
+command -v awk >/dev/null 2>&1 || { printf >&2 "I require awk but I am having trouble finding it.\n"; exit 1; }
+
+
+version=$(awk -F '"' '/^__version__/ {print $2}' flask_dynamo_session/__version__.py)
+for file in dist/*; do
+    pipenv run python -m twine upload --skip-existing $file || true
+done
+
+cd $START_DIR

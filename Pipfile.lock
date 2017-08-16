@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "991a4f67f2bc74ab60e99e0f2ac6120bed65e9089920f1fd91d916aba61a0633"
+            "sha256": "ca72dba101b0aff0567f7a8d3cda792355e0b5e35a9a8140327db87c1cfd1ffd"
         },
         "requires": {},
         "sources": [
@@ -92,6 +92,9 @@
         "pbr": {
             "version": "==3.1.1"
         },
+        "pkginfo": {
+            "version": "==1.4.1"
+        },
         "py": {
             "version": "==1.4.34"
         },
@@ -125,6 +128,9 @@
         "requests": {
             "version": "==2.18.4"
         },
+        "requests-toolbelt": {
+            "version": "==0.8.0"
+        },
         "setuptools": {
             "version": "==36.2.7"
         },
@@ -148,6 +154,12 @@
         },
         "stevedore": {
             "version": "==1.25.0"
+        },
+        "tqdm": {
+            "version": "==4.15.0"
+        },
+        "twine": {
+            "version": "==1.9.1"
         },
         "urllib3": {
             "version": "==1.22"
