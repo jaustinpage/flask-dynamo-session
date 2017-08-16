@@ -1,0 +1,90 @@
+version: 2
+jobs:
+  py3:
+    docker:
+      - image: python:3-alpine
+
+    working_directory: ~/flask-dynamo-session
+    parallelism: 1
+    steps:
+      - checkout
+
+      - run:
+          name: "Install dependencies from alpine pkgs"
+          command: |
+            set -e
+            set -x
+            apk add --update ca-certificates git gzip python3 tar
+            update-ca-certificates
+
+      - restore-cache:
+          keys:
+            - v1-python-{{ checksum "Pipfile.lock" }}
+            - v1-python-
+
+      - run:
+          name: "Python dependencies, tests, and build"
+          environment:
+            PIPENV_NOSPIN: True
+            CI_TEST_REPORTS: /tmp/ci_reports/
+          command: |
+            set -e
+            scripts/pipenv
+            scripts/pytest
+            scripts/build
+
+      - save-cache:
+          key: v1-python-{{ checksum "Pipfile.lock" }}-{{ epoch }}
+          paths:
+            - ~/.cache/pip
+
+      - store_test_results:
+          path: /tmp/ci_reports
+
+      - store_artifacts:
+          path: ./dist/
+          destination: py3
+
+      - persist_to_workspace:
+          root: ./dist/
+          paths:
+            - ./
+
+  gh_release:
+    docker:
+      - image: golang:alpine
+    working_directory: ~/flask-dynamo-session
+    parallelism: 1
+    steps:
+      - checkout
+
+      - run:
+          name: "Install dependencies from alpine pkgs"
+          command: |
+            set -e
+            set -x
+            apk add --update ca-certificates git gzip tar
+            update-ca-certificates
+            go get github.com/tcnksm/ghr
+
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - run:
+          name: "Upload GitHub Release"
+          command: |
+            version=$(awk -F '"' '/^__version__/ {print $2}' flask_dynamo_session/__init__.py)
+            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME $version /tmp/workspace || true
+            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -recreate -prerelease master /tmp/workspace
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - py3
+      - gh_release:
+          requires:
+            - py3
+          filters:
+            branches:
+              only: master

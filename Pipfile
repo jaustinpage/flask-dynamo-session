@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+
+[packages]
+flask-dynamo = "*"
+
+[dev-packages]
+bandit = "*"
+pycodestyle = "*"
+pydocstyle = "*"
+pylint = "*"
+pytest = "*"
+pytest-catchlog = "*"
+pytest-cov = "*"
+yapf = "*"
+Sphinx = "*"
+sphinx_rtd_theme = "*"

@@ -1,0 +1,154 @@
+#!/bin/sh
+
+set -e
+
+START_DIR="$PWD"
+SCRIPT_DIR="$( cd "$( dirname -- "$0" )" && pwd )"
+
+PYTEST_ARGS=$1
+
+PACKAGE_NAME="flask_dynamo_session"
+
+PACKAGE_DIR="./$PACKAGE_NAME/"
+OTHER_PY_FILES="./tests/"
+PYTHON_FILES="$PACKAGE_DIR $OTHER_PY_FILES"
+
+UTF_STR="# -*- coding: utf-8 -*-"
+
+check_yapf_format () {
+    yapf_out=$(pipenv run yapf --diff --recursive $PYTHON_FILES)
+    if [ "$yapf_out" ]; then
+        printf "yapf formatting was not applied to commit. Run `$SCRIPT_DIR/pytest` to fix.\n"
+        exit 1
+    else
+        printf ""
+    fi
+}
+
+fix_yapf_format () {
+    pipenv run yapf --in-place --recursive $PYTHON_FILES
+}
+
+yapf () {
+    printf "==> yapf --recursive $PYTHON_FILES... "
+    if [ "$CI" = "true" ]; then
+        check_yapf_format
+    else
+        fix_yapf_format
+    fi
+    printf "Done.\n\n"
+}
+
+pylint () {
+    # We disable for code anything that pylint complains about that conflicts with yapf
+    printf "==> pylint $PACKAGE_DIR"
+    pipenv run pylint --rcfile=setup.cfg --reports=n $PACKAGE_DIR
+    printf "==> pylint $OTHER_PY_FILES"
+    pipenv run pylint --rcfile=setup.cfg --reports=n \
+        --disable=missing-docstring,invalid-name,redefined-outer-name,bad-continuation,redefined-builtin,unused-argument,duplicate-code,protected-access \
+        $OTHER_PY_FILES
+}
+
+pycodestyle () {
+    printf "==> pycodestyle $PYTHON_FILES ... "
+    pipenv run pycodestyle $PYTHON_FILES
+    printf "Done.\n\n"
+}
+
+pydocstyle () {
+    printf "==> pydocstyle $PACKAGE_DIR ... "
+    pipenv run pydocstyle $PACKAGE_DIR
+    printf "Done.\n\n"
+}
+
+check_file_header () {
+    top_line=$(head -n 1 $1)
+    if [ "$top_line" != "$UTF_STR" ]; then
+        printf "utf-8 header not added to python file. Run`$SCRIPT_DIR/pytes` to fix.\n"
+        exit 1
+    fi
+}
+
+fix_file_header () {
+    top_line=$(head -n 1 $1)
+    if [ "$top_line" != "$UTF_STR" ]; then
+        printf "Adding utf-8 header to $1.\n"
+        sed -i "1s/^/$UTF_STR\\n/" $1
+    fi
+}
+
+fix_file_headers () {
+    printf "==> Checking *.py files for utf-8 header "
+    find ./ -type f -name "*.py" ! -size 0 | while read f; do
+        if [ "$CI" = "true" ]; then
+            check_file_header $f
+        else
+            fix_file_header $f
+        fi
+        printf "."
+    done
+    printf " Done.\n\n"
+}
+
+pytest () {
+    printf "==> pytest $PYTEST_ARGS ./tests/\n"
+    if [ "$CI" = "true" ]; then
+        mkdir -p $CI_TEST_REPORTS/pytest
+        pipenv run pytest --cov=$PACKAGE_DIR --junit-xml=$CI_TEST_REPORTS/pytest/unit.xml ./tests/
+    else
+        pipenv run pytest $PYTEST_ARGS --cov=$PACKAGE_DIR ./tests/
+    fi
+}
+
+bandit () {
+    printf "==> bandit -r $PACKAGE_DIR\n"
+    pipenv run bandit -r $PACKAGE_DIR
+    printf "\n"
+}
+
+sphinx () {
+    printf "==> spinx\n"
+    pipenv run python -msphinx -W -T -b dummy -d docs/_build/doctrees docs/ docs/_build/dummy
+    printf "\n"
+}
+
+update_requirements () {
+    pipenv run pip freeze > requirements.txt
+}
+
+check_requirements () {
+    requirements_diff=$(pipenv run pip freeze | diff - requirements.txt) || true
+    if [ "$requirements_diff" ]; then
+        printf "\n$requirements_diff\n\n"
+        printf "requirements.txt out of sync with pipenv. Run $SCRIPT_DIR/pytest to fix.\n"
+        exit 1
+    else
+        printf ""
+    fi
+}
+
+requirements () {
+    printf "==> pipenv run pip freeze > requirements.txt ..."
+    if [ "$CI" = "true" ]; then
+        check_requirements
+    else
+        update_requirements
+    fi
+    printf " Done.\n\n"
+
+}
+
+cd $SCRIPT_DIR
+cd ..
+
+fix_file_headers
+yapf
+pylint
+pycodestyle
+pydocstyle
+bandit
+requirements
+sphinx
+pytest
+
+cd $START_DIR

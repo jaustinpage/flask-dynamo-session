@@ -1,0 +1,92 @@
+#!/bin/sh
+
+# This script inits and updates your pipenv
+
+set -e
+set -x
+
+START_DIR="$PWD"
+SCRIPT_DIR="$( cd "$( dirname -- "$0" )" && pwd )"
+PIPENV_ARGS="${@:1}"
+PYTHON_VERSION=""
+
+while [[ $# -gt 1 ]]; do
+    key="$1"
+
+    case $key in
+        --three)
+        PYTHON_VERSION="3"
+        ;;
+        --two)
+        PYTHON_VERSION="2"
+        ;;
+        *)
+
+        ;;
+    esac
+
+    shift
+done
+
+install_pipenv () {
+    if [ "$CI" = "true" ]; then
+
+
+        if [ "$PYTHON_VERSION" = "2" ]; then
+            command -v python >/dev/null 2>&1 || { printf >&2 "I require python2 but it's not installed.  Aborting.\n"; exit 1; }
+            python -m pip install --upgrade pipenv
+        else
+            command -v python3 >/dev/null 2>&1 || { printf >&2 "I require python3 but it's not installed.  Aborting.\n"; exit 1; }
+            python3 -m pip install --upgrade pipenv
+        fi
+
+    else
+
+        if [ "$PYTHON_VERSION" = "2" ]; then
+            command -v python >/dev/null 2>&1 || { printf >&2 "I require python2 but it's not installed.  Aborting.\n"; exit 1; }
+            python -m pip install --user --upgrade pipenv
+        else
+            command -v python3 >/dev/null 2>&1 || { printf >&2 "I require python3 but it's not installed.  Aborting.\n"; exit 1; }
+            python3 -m pip install --user --upgrade pipenv
+        fi
+
+    fi
+}
+
+pipenv_init () {
+    if [ "$CI" = "true" ]; then
+
+        if [ "$PYTHON_VERSION" = "2" ]; then
+            pipenv install --dev --two --ignore-pipfile
+        else
+            pipenv install --dev --three --ignore-pipfile
+        fi
+
+    else
+
+        rm -f Pipfile.lock
+
+        if [ "$PYTHON_VERSION" = "2" ]; then
+            pipenv update --dev --two
+        else
+            pipenv update --dev --three
+        fi
+
+    fi
+}
+
+cd $SCRIPT_DIR
+cd ..
+
+install_pipenv
+pipenv_init
+
+if [ ! -z "$PIPENV_ARGS" ]; then
+    if [ ! -z "PYTHON_VERSION" ]; then
+        pipenv --three $PIPENV_ARGS
+    else
+        pipenv $PIPENV_ARGS
+    fi
+fi
+
+cd $START_DIR
