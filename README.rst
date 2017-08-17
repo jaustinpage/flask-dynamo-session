@@ -1,3 +1,5 @@
+:orphan:
+
 flask-dynamo-session
 ====================
 
