@@ -2,7 +2,7 @@ version: 2
 jobs:
   py3:
     docker:
-      - image: python:3-alpine
+      - image: python:3.6-alpine
 
     working_directory: ~/flask-dynamo-session
     parallelism: 1
@@ -61,7 +61,7 @@ jobs:
 
   py2:
     docker:
-      - image: python:2-alpine
+      - image: python:2.7-alpine
 
     working_directory: ~/flask-dynamo-session
     parallelism: 1

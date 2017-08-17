@@ -18,11 +18,12 @@ setup(
     classifiers=[
         'License :: OSI Approved :: Apache Software License',
         'Development Status :: 2 - Pre-Alpha',
-        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 2.7'
     ],
-    keywords='flask dynamo dynamodb, flask-dynamo',
+    keywords='flask dynamo dynamodb flask-dynamo',
     author='Austin Page',
     author_email='jaustinpage@gmail.com',
     url='https://github.com/jaustinpage/flask-dynamo-session',
-    license='Apache Software',
+    license='Apache License, Version 2.0',
     packages=find_packages(exclude=('docs', 'scripts', 'tests')))
