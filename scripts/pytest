@@ -140,6 +140,16 @@ requirements () {
 
 }
 
+pipenv_lock () {
+    printf "==> pipenv lock"
+    if [ "$CI" = "true" ]; then
+        printf " ... Skipping!"
+    else
+        pipenv lock
+    fi
+    printf "Done.\n\n"
+}
+
 cd $SCRIPT_DIR
 cd ..
 
@@ -149,8 +159,9 @@ pylint
 pycodestyle
 pydocstyle
 bandit
-requirements
 sphinx
 pytest
+requirements
+pipenv_lock
 
 cd $START_DIR
