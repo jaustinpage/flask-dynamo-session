@@ -4,6 +4,8 @@ from setuptools import setup, find_packages
 
 from flask_dynamo_session.__version__ import __version__
 
+from pipfile import api as pipfile
+
 with open('README.rst') as f:
     readme = f.read()
 
@@ -26,4 +28,6 @@ setup(
     author_email='jaustinpage@gmail.com',
     url='https://github.com/jaustinpage/flask-dynamo-session',
     license='Apache License, Version 2.0',
-    packages=find_packages(exclude=('docs', 'scripts', 'tests')))
+    packages=find_packages(exclude=('docs', 'scripts', 'tests')),
+    install_requires=pipfile.load().data['default'].keys()
+)

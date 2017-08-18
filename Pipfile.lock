@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ca72dba101b0aff0567f7a8d3cda792355e0b5e35a9a8140327db87c1cfd1ffd"
+            "sha256": "a81b7085f3d0ff4e8a698515074f44609d599aafe27a1f752938555d5c96a8ae"
         },
         "requires": {},
         "sources": [
@@ -92,6 +92,9 @@
         "pbr": {
             "version": "==3.1.1"
         },
+        "pipfile": {
+            "version": "==0.0.2"
+        },
         "pkginfo": {
             "version": "==1.4.1"
         },
@@ -154,6 +157,9 @@
         },
         "stevedore": {
             "version": "==1.25.0"
+        },
+        "toml": {
+            "version": "==0.9.2"
         },
         "tqdm": {
             "version": "==4.15.0"
