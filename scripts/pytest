@@ -62,17 +62,15 @@ pydocstyle () {
 }
 
 check_file_header () {
-    top_line=$(head -n 1 $1)
-    if [ "$top_line" != "$UTF_STR" ]; then
+    if ! head -n 2 $1 | grep -q -F "$UTF_STR"; then
         printf "utf-8 header not added to python file. Run`$SCRIPT_DIR/pytes` to fix.\n"
         exit 1
     fi
 }
 
 fix_file_header () {
-    top_line=$(head -n 1 $1)
-    if [ "$top_line" != "$UTF_STR" ]; then
-        printf "Adding utf-8 header to $1.\n"
+    if ! head -n 2 $1 | grep -q -F "$UTF_STR"; then
+        printf "Adding utf-8 header to $1"
         sed -i "1s/^/$UTF_STR\\n/" $1
     fi
 }
@@ -141,13 +139,21 @@ requirements () {
 }
 
 pipenv_lock () {
-    printf "==> pipenv lock"
+    printf "==> checking Pipfile.lock ..."
     if [ "$CI" = "true" ]; then
-        printf " ... Skipping!"
+        if ! pipenv run python scripts/check_pipfile.py; then
+            printf "Pipfile.lock is out of date. run pipenv lock to fix.\n"
+            exit 1
+        else
+            printf "Done.\n\n"
+        fi
     else
-        pipenv lock
+        if ! pipenv run python scripts/check_pipfile.py; then
+            printf " running pipenv lock ..."
+            pipenv lock
+        fi
     fi
-    printf "Done.\n\n"
+    printf " Done.\n\n"
 }
 
 cd $SCRIPT_DIR
