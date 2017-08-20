@@ -28,3 +28,11 @@ flask-dynamo-session
     :alt: Documentation Status
 
 Uses flask-dynamo to store the flask session serverside.
+
+Development
+-----------
+
+Conventions
+-----------
+
+Tests are built using python 3 only.

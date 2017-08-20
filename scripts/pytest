@@ -106,8 +106,12 @@ bandit () {
 
 sphinx () {
     printf "==> spinx\n"
-    pipenv run python -msphinx -W -T -b dummy -d docs/_build/doctrees docs/ docs/_build/dummy
-    printf "\n"
+    if [ "$PYTHON_VERSION" = "3" ]; then
+        pipenv run python -msphinx -W -T -b dummy -d docs/_build/doctrees docs/ docs/_build/dummy
+        printf "\n"
+    else
+        printf " ... Skipping on python 2. Done.\n\n"
+    fi
 }
 
 update_requirements () {
