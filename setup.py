@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-from flask_dynamo_session.__version__ import __version__
+from flask_dynamo_session import __about__ as about
 
 from pipfile import api as pipfile
 
@@ -13,9 +13,9 @@ with open('LICENSE') as f:
     license_file = f.read()
 
 setup(
-    name='flask-dynamo-session',
-    version=__version__,
-    description='Flask extension for storing session in dynamodb. Uses flask_dynamo.',
+    name=about.__package_name__,
+    version=about.__version__,
+    description=about.__doc__,
     long_description=readme,
     classifiers=[
         'License :: OSI Approved :: Apache Software License',
@@ -24,10 +24,10 @@ setup(
         'Programming Language :: Python :: 2.7'
     ],
     keywords='flask dynamo dynamodb flask-dynamo',
-    author='Austin Page',
-    author_email='jaustinpage@gmail.com',
-    url='https://github.com/jaustinpage/flask-dynamo-session',
-    license='Apache License, Version 2.0',
+    author=about.__author__,
+    author_email=about.__email__,
+    url=about.__website__,
+    license=about.__license__,
     packages=find_packages(exclude=('docs', 'scripts', 'tests')),
     install_requires=pipfile.load().data['default'].keys()
 )

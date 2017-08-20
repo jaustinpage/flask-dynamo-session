@@ -12,7 +12,7 @@ command -v pipenv >/dev/null 2>&1 || { printf >&2 "I require pipenv but I am hav
 command -v awk >/dev/null 2>&1 || { printf >&2 "I require awk but I am having trouble finding it.\n"; exit 1; }
 
 
-version=$(awk -F '"' '/^__version__/ {print $2}' flask_dynamo_session/__version__.py)
+version=$(awk -F '"' '/^__version__/ {print $2}' flask_dynamo_session/__about__.py)
 for file in dist/*; do
     pipenv run python -m twine upload --skip-existing $file || true
 done
